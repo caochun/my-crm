@@ -1,0 +1,2 @@
+name,contact_id,company_id,stage,value,currency,expected_close_date,owner,id,created_at,updated_at
+腾讯 SaaS 软件销售,955d51a2-18c0-4758-aac9-f4d84b2c8ed3,563500b0-51db-4e64-914d-3e75c79e6b99,proposal,500000,CNY,2026-06-30,销售 A,971645df-9a10-4dd0-b9d6-bf2babfd018d,2026-04-11T02:15:25.441295+00:00,2026-04-11T02:15:59.644388+00:00
