@@ -1,28 +1,72 @@
-description: "销售团队 CRM 数据，管理客户联系人、公司、商机和沟通记录"
-
+description: 销售团队 CRM 数据，管理客户联系人、公司、商机、沟通记录和合同
 tables:
-  contacts: "客户联系人。包含姓名、邮箱、电话、职位、所属公司、线索来源、负责人、标签、跟进状态"
-  companies: "公司/客户组织。包含公司名称、行业、规模、网站、地址、电话"
-  deals: "销售商机/机会。跟踪销售漏斗各阶段（lead→qualified→proposal→negotiation→won/lost），记录金额和预计成交日期"
-  interactions: "与客户的沟通记录（只增不改）。包含沟通类型（电话/邮件/会议/微信/备注）和内容"
-  tasks: "待办/跟进任务。包含标题、负责人、截止日期、优先级、状态"
-
+  contacts: 客户联系人。包含姓名、邮箱、电话、职位、所属公司、线索来源、负责人、标签、跟进状态
+  companies: 公司/客户组织。包含公司名称、行业、规模、网站、地址、电话
+  deals: 销售商机/机会。跟踪销售漏斗各阶段（lead→qualified→proposal→negotiation→won/lost），记录金额和预计成交日期
+  interactions: 与客户的沟通记录（只增不改）。包含沟通类型（电话/邮件/会议/微信/备注）和内容
+  tasks: 待办/跟进任务。包含标题、负责人、截止日期、优先级、状态
+  employees: 员工/团队成员表。包含姓名、邮箱、角色、部门、状态等，用于关联 contacts、deals、tasks 中的 owner 和 assignee
+    字段
+  contracts: 销售合同。包含合同号、关联商机、金额、条款、签署日期、状态、附件等
 relationships:
-  - "contacts.company_id → companies.id"
-  - "deals.contact_id → contacts.id"
-  - "deals.company_id → companies.id"
-  - "interactions.contact_id → contacts.id"
-  - "interactions.deal_id → deals.id"
-  - "tasks.contact_id → contacts.id"
-  - "tasks.deal_id → deals.id"
-
+- from: contacts
+  fromCol: company_id
+  to: companies
+  toCol: id
+- from: deals
+  fromCol: contact_id
+  to: contacts
+  toCol: id
+- from: deals
+  fromCol: company_id
+  to: companies
+  toCol: id
+- from: interactions
+  fromCol: contact_id
+  to: contacts
+  toCol: id
+- from: interactions
+  fromCol: deal_id
+  to: deals
+  toCol: id
+- from: tasks
+  fromCol: contact_id
+  to: contacts
+  toCol: id
+- from: tasks
+  fromCol: deal_id
+  to: deals
+  toCol: id
+- from: contacts
+  fromCol: owner_id
+  to: employees
+  toCol: id
+- from: deals
+  fromCol: owner_id
+  to: employees
+  toCol: id
+- from: tasks
+  fromCol: assignee_id
+  to: employees
+  toCol: id
+- from: contracts
+  fromCol: deal_id
+  to: deals
+  toCol: id
+- from: contracts
+  fromCol: contact_id
+  to: contacts
+  toCol: id
+- from: contracts
+  fromCol: company_id
+  to: companies
+  toCol: id
+- from: contracts
+  fromCol: owner_id
+  to: employees
+  toCol: id
 notes:
-  - "contacts.status 含义：active=正在跟进，inactive=已停止，pending=待联系"
-  - "contacts.source 含义：inbound=主动咨询，outbound=外呼开发，referral=转介绍，website=官网注册，event=展会/活动，social=社交媒体，other=其他"
-  - "companies.size 含义：startup=初创（<50人），sme=中小企业（50-500人），enterprise=大型企业（>500人）"
-  - "deals.stage 是销售漏斗：lead→qualified→proposal→negotiation→won/lost"
-  - "deals.value 为字符串格式的金额数字，currency 默认 CNY"
-  - "interactions 表不应修改已有记录，只能追加新记录"
-  - "tasks.priority 含义：low=低优先级，medium=一般，high=紧急"
-  - "tasks.status 含义：todo=待办，in_progress=进行中，done=已完成，cancelled=已取消"
-  - "contacts.tags 为逗号分隔的标签字符串，如 'VIP,重点客户'"
+- contracts 表新增后，字段类型统一使用 uuid 作为外键类型
+- contract_number 字段建议设置唯一约束，避免合同号重复
+- contracts 表与 deals 表是一对多关系，一个商机可对应多个合同（如分期合同）
+- 合同金额使用 string 类型以支持不同货币格式和精度需求
